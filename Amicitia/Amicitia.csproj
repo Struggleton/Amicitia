@@ -61,6 +61,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\AssimpNet.3.3.1\lib\net45\AssimpNet.dll</HintPath>
     </Reference>
+    <Reference Include="ManagedNvTriStrip">
+      <HintPath>..\Dependencies\ManagedNvTriStrip.dll</HintPath>
+    </Reference>
     <Reference Include="OpenTK, Version=1.1.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
       <HintPath>..\packages\OpenTK.1.1.2225.0\lib\net20\OpenTK.dll</HintPath>
       <Private>True</Private>
@@ -82,11 +85,27 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AudioPlayer.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="AudioPlayer.Designer.cs">
+      <DependentUpon>AudioPlayer.cs</DependentUpon>
+    </Compile>
     <Compile Include="ModelViewer\ModelViewer.cs" />
     <Compile Include="ModelViewer\ShaderProgram.cs" />
+    <Compile Include="OptionsForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="OptionsForm.Designer.cs">
+      <DependentUpon>OptionsForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="ResourceProperty.cs" />
+    <Compile Include="ResourceWrappers\ACXFileWrapper.cs" />
     <Compile Include="ResourceWrappers\AMDFileWrapper.cs" />
+    <Compile Include="ResourceWrappers\AFSFileWrapper.cs" />
+    <Compile Include="ResourceWrappers\AWBFileWrapper.cs" />
     <Compile Include="ResourceWrappers\BVPArchiveWrapper.cs" />
+    <Compile Include="ResourceWrappers\EPLFileWrapper.cs" />
     <Compile Include="ResourceWrappers\ListArchiveFileWrapper.cs" />
     <Compile Include="ResourceWrappers\PNGFileWrapper.cs" />
     <Compile Include="ResourceWrappers\RMD\RMDSceneWrapper.cs" />
@@ -116,8 +135,14 @@
     <Compile Include="SupportedFileHandler.cs" />
     <Compile Include="SupportedFileInfo.cs" />
     <Compile Include="Utilities\TreeNodeCollectionExtension.cs" />
+    <EmbeddedResource Include="AudioPlayer.resx">
+      <DependentUpon>AudioPlayer.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="OptionsForm.resx">
+      <DependentUpon>OptionsForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -148,6 +173,9 @@
   <ItemGroup>
     <Content Include="Igoricon.ico" />
     <Compile Include="ResourceWrappers\WrapperTemplate.cs" />
+    <None Include="Resources\stopicons.png" />
+    <None Include="Resources\playicons.png" />
+    <None Include="Resources\playicon.png" />
     <EmbeddedResource Include="shader.fs" />
   </ItemGroup>
   <ItemGroup>

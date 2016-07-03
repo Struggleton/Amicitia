@@ -1,6 +1,5 @@
 ﻿namespace Amicitia.ResourceWrappers
 {
-    using System.IO;
     using System;
     using System.ComponentModel;
     using System.Collections.Generic;
@@ -20,7 +19,7 @@
         /*****************************************/
         /* Import / Export delegate dictionaries */
         /*****************************************/
-       public static readonly new Dictionary<SupportedFileType, Action<ResourceWrapper, string>> ImportDelegates = new Dictionary<SupportedFileType, Action<ResourceWrapper, string>>()
+        public static readonly new Dictionary<SupportedFileType, Action<ResourceWrapper, string>> ImportDelegates = new Dictionary<SupportedFileType, Action<ResourceWrapper, string>>()
         {
             {
                 SupportedFileType.AMDFile, (res, path) =>
@@ -57,7 +56,7 @@
         /***************/
         /* Constructor */
         /***************/
-        public AMDFileWrapper(string text, AMDFile res) 
+        public AMDFileWrapper(string text, AMDFile res)
             : base(text, res, SupportedFileType.AMDFile, true)
         {
             m_canExport = false;

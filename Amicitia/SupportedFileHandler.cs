@@ -13,6 +13,11 @@
     using AtlusLibSharp.Graphics.TMX;
     using AtlusLibSharp.Graphics.SPR;
     using AtlusLibSharp.Graphics.TGA;
+    using AtlusLibSharp.FileSystems.ACX;
+    using AtlusLibSharp.FileSystems.AFS;
+    using AtlusLibSharp.FileSystems.AMD;
+    using AtlusLibSharp.FileSystems.AWB;
+    using AtlusLibSharp.FileSystems.EPL;
 
     internal static class SupportedFileHandler
     {
@@ -29,6 +34,10 @@
             new SupportedFileInfo("Atlus Generic List Archive",         SupportedFileType.ListArchiveFile,      false, ".arc", ".bin", ".pak", ".pac", ".abin", ".se", ".pse"),
             new SupportedFileInfo("Persona 3/4 Battle Voice Package",   SupportedFileType.BVPArchiveFile,       false, ".bvp"),
             new SupportedFileInfo("Atlus Vita Resource Container",      SupportedFileType.AMDFile,              false, ".amd"),
+            new SupportedFileInfo("Criware Generic Sound Package",      SupportedFileType.AWBFile,              false, ".awb"),
+            new SupportedFileInfo("Criware Sound Package",              SupportedFileType.AFSFile,              false, ".afs"),
+            new SupportedFileInfo("Criware Voice Package",              SupportedFileType.ACXFile,              false, ".acx"),
+            new SupportedFileInfo("Atlus General Package",              SupportedFileType.EPLFile,              false, ".epl"),
 
             // Texture (container) formats
             new SupportedFileInfo("Atlus PS2 Texture",                  SupportedFileType.TMXFile,              false, ".tmx"),
@@ -39,7 +48,7 @@
 
             // Model formats
             new SupportedFileInfo("Atlus RenderWare Scene Container",   SupportedFileType.RMDScene,             false, ".rmd", ".rws"),
-            new SupportedFileInfo("RenderWare Scene",                   SupportedFileType.RWScene,              false, ".dff")
+            new SupportedFileInfo("RenderWare Scene",                   SupportedFileType.RWScene,              false, ".dff"),
         };
 
         private static readonly Dictionary<SupportedFileType, Type> _supportedFileTypeEnumToType = new Dictionary<SupportedFileType, Type>()
@@ -47,7 +56,12 @@
             // Archive formats
             { SupportedFileType.BVPArchiveFile,         typeof(BVPFile) },
             { SupportedFileType.ListArchiveFile,        typeof(ListArchiveFile) },
-            { SupportedFileType.PAKToolArchiveFile,            typeof(PAKToolArchiveFile) },
+            { SupportedFileType.PAKToolArchiveFile,     typeof(PAKToolArchiveFile) },
+            { SupportedFileType.AMDFile,                typeof(AMDFile) },
+            { SupportedFileType.AWBFile,                typeof(AWBFile) },
+            { SupportedFileType.AFSFile,                typeof(AFSFile) },
+            { SupportedFileType.ACXFile,                typeof(ACXFile) },
+            { SupportedFileType.EPLFile,                typeof(EPLFile) },
 
             // Texture formats
             { SupportedFileType.RWTextureDictionary,    typeof(RWTextureDictionary) },

@@ -11,7 +11,7 @@
         public SPRKeyFrameWrapper(string text, SPRKeyFrame keyFrame) 
             : base(text, keyFrame, SupportedFileType.Resource, true)
         {
-            m_canExport = false;
+            m_canExport = true;
             m_canRename = false;
             m_canReplace = false;
             InitializeContextMenuStrip();

@@ -11,6 +11,10 @@
     using AtlusLibSharp.Graphics.TGA;
     using AtlusLibSharp.IO;
     using AtlusLibSharp.FileSystems.AMD;
+    using AtlusLibSharp.FileSystems.AWB;
+    using AtlusLibSharp.FileSystems.AFS;
+    using AtlusLibSharp.FileSystems.ACX;
+    using AtlusLibSharp.FileSystems.EPL;
 
     internal static class ResourceFactory
     {
@@ -40,6 +44,15 @@
 
                 case SupportedFileType.AMDFile:
                     return new AMDFileWrapper(text, new AMDFile(stream));
+                case SupportedFileType.AWBFile:
+                    return new AWBFileWrapper(text, new AWBFile(stream));
+                case SupportedFileType.AFSFile:
+                    return new AFSFileWrapper(text, new AFSFile(stream));
+                case SupportedFileType.ACXFile:
+                    return new ACXFileWrapper(text, new ACXFile(stream));
+
+                case SupportedFileType.EPLFile:
+                    return new EPLFileWrapper(text, new EPLFile(stream));
 
                 // Texture formats
                 case SupportedFileType.RWTextureDictionary:

@@ -43,6 +43,8 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <DocumentationFile>
     </DocumentationFile>
+    <Prefer32Bit>false</Prefer32Bit>
+    <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -54,6 +56,7 @@
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <DocumentationFile>..\Build\Release\AtlusLibSharp.XML</DocumentationFile>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject />
@@ -63,8 +66,7 @@
       <HintPath>..\packages\AssimpNet.3.3.1\lib\net45\AssimpNet.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="ManagedNvTriStrip, Version=0.0.0.0, Culture=neutral, processorArchitecture=x86">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="ManagedNvTriStrip">
       <HintPath>..\Dependencies\ManagedNvTriStrip.dll</HintPath>
     </Reference>
     <Reference Include="OpenTK, Version=1.1.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
@@ -74,15 +76,26 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Audio\ADXFile.cs" />
+    <Compile Include="Audio\CriwareHeader.cs" />
+    <Compile Include="FileSystems\ACX\ACXFile.cs" />
+    <Compile Include="FileSystems\AFS\AFSFile.cs" />
     <Compile Include="FileSystems\AMD\AMDChunk.cs" />
     <Compile Include="FileSystems\AMD\AMDFile.cs" />
+    <Compile Include="FileSystems\AWB\AWBFile.cs" />
+    <Compile Include="FileSystems\EPL\EPLFile.cs" />
+    <Compile Include="FileSystems\IArchiveEntry.cs" />
     <Compile Include="Compression\ICompression.cs" />
+    <Compile Include="FileSystems\ISO\ISOFile.cs" />
     <Compile Include="FileSystems\ISO\Enums.cs" />
+    <Compile Include="FileSystems\ISO\PathTable.cs" />
+    <Compile Include="FileSystems\ISO\PrimaryDescriptor.cs" />
     <Compile Include="Graphics\RenderWare\RWMeshMaterialSplitData.cs" />
     <Compile Include="Graphics\TGA\TGAEncoding.cs" />
     <Compile Include="Graphics\TMX\TMXWrapMode.cs" />
@@ -91,6 +104,7 @@
     <Compile Include="FileSystems\PAKToolArchive\PAKToolArchiveFile.cs" />
     <Compile Include="FileSystems\ListArchive\ListArchiveFile.cs" />
     <Compile Include="FileSystems\ListArchive\ListArchiveFileEntry.cs" />
+    <Compile Include="FileSystems\IArchive.cs" />
     <Compile Include="IO\GenericBinaryFile.cs" />
     <Compile Include="Graphics\TGA\TGAFile.cs" />
     <Compile Include="Graphics\ITextureFile.cs" />
@@ -199,9 +213,12 @@
     <Compile Include="Scripting\TypeTableEntry.cs" />
     <Compile Include="Compression\PointerRelocationTableCompression.cs" />
     <Compile Include="Utilities\AlignmentHelper.cs" />
+    <Compile Include="Utilities\AudioHelper.cs" />
     <Compile Include="Utilities\BinaryIOExtension.cs" />
     <Compile Include="Utilities\BitHelper.cs" />
     <Compile Include="Utilities\BitmapHelper.cs" />
+    <Compile Include="Utilities\BinaryEndiannessExtension.cs" />
+    <Compile Include="Utilities\BitStream.cs" />
     <Compile Include="Utilities\EnumExtension.cs" />
     <Compile Include="Utilities\ICollectionExtension.cs" />
     <Compile Include="Utilities\IListExtension.cs" />
@@ -214,6 +231,7 @@
     <Compile Include="PS2\Graphics\Interfaces\VIF\VIFCodeEvaluator.cs" />
     <Compile Include="PS2\Graphics\Interfaces\VIF\VIFTag.cs" />
     <Compile Include="PS2\Graphics\Interfaces\VIF\VIFUnpack.cs" />
+    <Compile Include="Utilities\NvTriStrip\NvTriStrip.cs" />
     <Compile Include="Utilities\OpenTKVector3Extension.cs" />
     <Compile Include="Utilities\StreamExtension.cs" />
     <Compile Include="Utilities\WuQuantizer\Box.cs" />
@@ -247,7 +265,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Graphics\MD\" />
-    <Folder Include="Utilities\NvTriStrip\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\AssimpNet.3.3.1\build\AssimpNet.targets" Condition="Exists('..\packages\AssimpNet.3.3.1\build\AssimpNet.targets')" />

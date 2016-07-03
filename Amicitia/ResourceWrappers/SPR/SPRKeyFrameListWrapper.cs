@@ -12,7 +12,7 @@
         public SPRKeyFrameListWrapper(string text, List<SPRKeyFrame> keyFrames) 
             : base(text, keyFrames, SupportedFileType.Resource, true)
         {
-            m_canExport = false;
+            m_canExport = true;
             m_canMove = false;
             m_canRename = false;
             m_canReplace = false;

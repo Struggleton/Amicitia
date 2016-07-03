@@ -8,13 +8,14 @@ using OpenTK;
 using System.Runtime.InteropServices;
 using Amicitia.ModelViewer;
 using AtlusLibSharp.Graphics.RenderWare;
+using AtlusLibSharp.Audio;
 using System.Drawing;
+using System.Reflection;
 
 namespace Amicitia
 {
     public partial class MainForm : Form
     {
-        //private static Rectangle _lastMainTreeViewSize;
         private static MainForm _instance;
         private ModelViewer.ModelViewer viewer;
 
@@ -24,17 +25,10 @@ namespace Amicitia
 
         internal static MainForm Instance
         {
-            get
-            {
-                return _instance;
-            }
+            get { return _instance; }
             set
             {
-                if (_instance != null)
-                {
-                    throw new Exception("Instance already exists!");
-                }
-
+                if (_instance != null) { throw new Exception("Instance already exists!"); }
                 _instance = value;
             }
         }
@@ -58,28 +52,33 @@ namespace Amicitia
         {
             InitializeComponent();
             InitializeMainForm();
-#if DEBUG
-            AllocConsole();
-#endif
+
+            #if DEBUG
+                AllocConsole();
+            #endif
         }
 
-        // Events
+        private void AddToList(string text)
+        {
+            if (Properties.Settings.Default.RecFls.IndexOf(text) == -1)
+                Properties.Settings.Default.RecFls.Add(text);
+        }
+
+        private void AddItemDropDown(string text)
+        {
+            recentFilesToolStripMenuItem.DropDownItems.Add(Path.GetFileName(text));
+        }
+
         private void MainForm_DragEnter(object sender, DragEventArgs e)
         {
-            if (e.Data.GetDataPresent(DataFormats.FileDrop))
-                e.Effect = DragDropEffects.Copy;
-            else
-                e.Effect = DragDropEffects.None;
+            if (e.Data.GetDataPresent(DataFormats.FileDrop)) e.Effect = DragDropEffects.Copy;
+            else e.Effect = DragDropEffects.None;
         }
 
         private void MainForm_DragDrop(object sender, DragEventArgs e)
         {
             string[] filePaths = (string[])e.Data.GetData(DataFormats.FileDrop, false);
-
-            if (filePaths.Length > 0)
-            {
-                HandleFileOpenFromPath(filePaths[0]);
-            }
+            if (filePaths.Length > 0) HandleFileOpenFromPath(filePaths[0]);
         }
 
         private void MainTreeView_AfterLabelEdit(object sender, NodeLabelEditEventArgs e)
@@ -89,31 +88,22 @@ namespace Amicitia
 
         private void MainTreeView_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Control)
-            {
-                HandleTreeViewCtrlShortcuts(e.KeyData);
-            }
+            if (e.Control) HandleTreeViewCtrlShortcuts(e.KeyData);
         }
 
         private void MainTreeView_AfterSelect(object sender, TreeViewEventArgs e)
         {
-            // hide the picture box
             mainPictureBox.Visible = false;
             viewer.DeleteScene();
             glControl1.Visible = false;
             ResourceWrapper res = mainTreeView.SelectedNode as ResourceWrapper;
 
             mainPropertyGrid.SelectedObject = res;
-
-            if (res == null)
-                return;
+            if (res == null) return;
 
             if(res.IsModelResource == true)
             {
-                try
-                {
-                    viewer.LoadScene((res as ResourceWrapper).WrappedObject as RMDScene);
-                }
+                try { viewer.LoadScene((res as ResourceWrapper).WrappedObject as RMDScene); }
                 catch (Exception ex)
                 {
                     Console.WriteLine(ex.Message);
@@ -121,20 +111,16 @@ namespace Amicitia
                 }
                 glControl1.Visible = true;
             }
-            // Check if the resource is a texture
+
             if (res.IsImageResource == true)
             {
-                // Unhide the picture box if we have a picture selected
                 mainPictureBox.Visible = true;
                 mainPictureBox.Image = ((ITextureFile)res.WrappedObject).GetBitmap();
             }
-
-            //res.InitializeCustomPropertyGrid();
         }
 
         private void MainTreeView_NodeMouseClick(object sender, TreeNodeMouseClickEventArgs e)
         {
-            // Setting this will make all mouse clicks select a node, as opposed to only left clicks
             mainTreeView.SelectedNode = e.Node;
         }
 
@@ -143,176 +129,95 @@ namespace Amicitia
             using (OpenFileDialog openFileDlg = new OpenFileDialog())
             {
                 openFileDlg.Filter = SupportedFileHandler.FileFilter;
-
-                // Exit out if user didn't select a file
-                if (openFileDlg.ShowDialog() != DialogResult.OK)
-                {
-                    return;
-                }
-
+                if (openFileDlg.ShowDialog() != DialogResult.OK) return;
                 HandleFileOpenFromPath(openFileDlg.FileName);
             }
         }
 
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (mainTreeView.Nodes.Count > 0)
-            {
-                ((ResourceWrapper)mainTreeView.TopNode).Export(sender, e);
-            }
+            if (mainTreeView.Nodes.Count > 0) ((ResourceWrapper)mainTreeView.TopNode).Export(sender, e);
         }
 
-        // Internal methods
         internal void UpdateReferences()
         {
             MainTreeView_AfterSelect(this, new TreeViewEventArgs(mainTreeView.SelectedNode));
         }
 
-        // Initializer
         private void InitializeMainForm()
         {
-            // this
-            Instance = this;
-            DragDrop += MainForm_DragDrop;
-            DragEnter += MainForm_DragEnter;
-            //MouseMove += MainForm_MouseMove;
-            //_lastMainTreeViewSize = mainTreeView.Bounds;
+            DateTime time = File.GetLastWriteTime(Assembly.GetExecutingAssembly().Location);
+            Text = string.Format("Amicitia [{0}/{1}/{2}] [DEBUG]", time.Month, time.Day, time.Year);
 
-            // mainTreeView
+            Instance = this;
             mainTreeView.AfterSelect += MainTreeView_AfterSelect;
             mainTreeView.KeyDown += MainTreeView_KeyDown;
             mainTreeView.AfterLabelEdit += MainTreeView_AfterLabelEdit;
             mainTreeView.NodeMouseClick += MainTreeView_NodeMouseClick;
-            //mainTreeView.SizeChanged += MainTreeView_SizeChanged;
-            
-            // mainPictureBox
             mainPictureBox.Visible = false;
-
-            // mainPropertyGrid
             mainPropertyGrid.PropertySort = PropertySort.NoSort;
-        }
 
-        /*
-        private void MainForm_MouseMove(object sender, MouseEventArgs e)
-        {
-            if (e.X == mainPictureBox.Location.X + mainPictureBox.Size.Width)
+            foreach (string name in Properties.Settings.Default.RecFls)
             {
-                Cursor.Current = Cursors.SizeWE;
+                AddItemDropDown(name);
             }
         }
 
-        private void MainTreeView_SizeChanged(object sender, EventArgs e)
-        {
-            float widthDiff = mainTreeView.Bounds.Width - _lastMainTreeViewSize.Width;
-
-            MoveDockedObject(mainPictureBox, (int)widthDiff * 2, 0);
-            MoveDockedObject(mainPropertyGrid, (int)widthDiff * 2, 0);
-
-            if (mainPictureBox.Bounds.IntersectsWith(mainTreeView.Bounds) || mainPropertyGrid.Bounds.IntersectsWith(mainTreeView.Bounds))
-            {
-                
-                MoveDockedObject(mainPictureBox, -2, 0);
-                MoveDockedObject(mainPropertyGrid, -2, 0);
-                
-            }
-
-            _lastMainTreeViewSize = mainTreeView.Bounds;
-        }
-
-        private void MoveDockedObject(Control control, int width, int height)
-        {
-            Rectangle old = control.Bounds;
-            old.X += width;
-            old.Y += height;
-            control.Bounds = old;
-        }
-        */
-
-        // Handlers
         private void HandleTreeViewCtrlShortcuts(Keys keys)
         {
             ResourceWrapper res = (ResourceWrapper)mainTreeView.SelectedNode;
 
-            // Move up
             if (keys.HasFlagUnchecked(Keys.Up))
             {
-                if (res.CanMove)
-                {
-                    res.MoveUp(this, EventArgs.Empty);
-                }
+                if (res.CanMove) res.MoveUp(this, EventArgs.Empty);
             }
 
-            // Move down
             else if (keys.HasFlagUnchecked(Keys.Down))
             {
-                if (res.CanMove)
-                {
-                    res.MoveDown(this, EventArgs.Empty);
-                }
+                if (res.CanMove) res.MoveDown(this, EventArgs.Empty);
             }
 
-            // Delete
             else if (keys.HasFlagUnchecked(Keys.Delete))
             {
-                if (res.CanDelete)
-                {
-                    res.Delete(this, EventArgs.Empty);
-                }
+                if (res.CanDelete) res.Delete(this, EventArgs.Empty);
             }
 
-            // Replace
             else if (keys.HasFlagUnchecked(Keys.R))
             {
-                if (res.CanReplace)
-                {
-                    res.Replace(this, EventArgs.Empty);
-                }
+                if (res.CanReplace) res.Replace(this, EventArgs.Empty);
             }
 
-            // Rename
             else if (keys.HasFlagUnchecked(Keys.E))
             {
-                if (res.CanRename)
-                {
-                    res.Export(this, EventArgs.Empty);
-                }
+                if (res.CanRename) res.Export(this, EventArgs.Empty);
             }
         }
 
         private void HandleFileOpenFromPath(string filePath)
         {
             if (viewer.IsSceneReady == true) viewer.DeleteScene();
-            // Get the supported file index so we can check if it's /actually/ supported as you can override the filter easily by copy pasting
             int supportedFileIndex = SupportedFileHandler.GetSupportedFileIndex(filePath);
-
-            if (supportedFileIndex == -1)
-            {
-                return;
-            }
-
-            // Hide the picture box so a possibly last selected image doesn't stay visible
-            if (mainPictureBox.Visible == true)
-            {
-                mainPictureBox.Visible = false;
-            }
-
-            // Clear nodes as we don't want multiple hierarchies
+            if (supportedFileIndex == -1) return;
+            if (mainPictureBox.Visible == true) mainPictureBox.Visible = false;
             if (mainTreeView.Nodes.Count > 0)
-            {
                 mainTreeView.Nodes.Clear();
+            if (Properties.Settings.Default.RemRecOpnFls)
+            {
+                AddToList(filePath);
+                AddItemDropDown(Path.GetFileName(filePath));
             }
 
             TreeNode treeNode = null;
 
-#if !DEBUG
+            #if !DEBUG
             try
             {
-#endif
-                // Get the resource from the factory and it to the tree view
-                treeNode = ResourceFactory.GetResource(
-                    Path.GetFileName(filePath),
-                    File.OpenRead(filePath), supportedFileIndex);
-#if !DEBUG
+            #endif
+
+            treeNode = 
+                ResourceFactory.GetResource(Path.GetFileName(filePath), File.OpenRead(filePath), supportedFileIndex);
+            
+            #if !DEBUG
             }
             catch (InvalidDataException exception)
             {
@@ -320,20 +225,14 @@ namespace Amicitia
                     MessageBoxButtons.OK, MessageBoxIcon.Error, MessageBoxDefaultButton.Button1, MessageBoxOptions.DefaultDesktopOnly);
                 return;
             }
-#endif
+            #endif
 
-                mainTreeView.BeginUpdate();
-
+            mainTreeView.BeginUpdate();
             mainTreeView.Nodes.Add(treeNode);
             mainTreeView.SelectedNode = mainTreeView.TopNode;
-
             mainTreeView.EndUpdate();
         }
 
-        private void mainPictureBox_Click(object sender, EventArgs e)
-        {
-
-        }
 
         private void glControl1_Load(object sender, EventArgs e)
         {
@@ -341,55 +240,25 @@ namespace Amicitia
             viewer = new ModelViewer.ModelViewer(glControl1);
         }
 
-        private void mainTreeView_AfterSelect_1(object sender, TreeViewEventArgs e)
-        {
-
-        }
-
-        private void mainMenuStrip_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
-        {
-
-        }
-
-        private void MainForm_Load(object sender, EventArgs e)
-        {
-
-        }
-
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
+            Properties.Settings.Default.Save();
             viewer.DisposeViewer();
         }
 
         private void optionsToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Form options = new Form();
-            Label colorlab = new Label();
-            Label more = new Label();
-            Button picker = new Button();
-            options.Text = "Options";
-            more.Text = "Stay tuned...";
-            more.Location = new Point(16, 80);
-            more.ForeColor = Color.Gray;
-            more.Font = new Font(more.Font, FontStyle.Italic);
-            picker.Text = "...";
-            picker.Location = new System.Drawing.Point(140, 16);
-            picker.Width /= 3;
-            picker.Click += (object s, EventArgs ev) =>
-            {
-                ColorDialog d = new ColorDialog();
-                d.Color = viewer.BGColor;
-                d.ShowDialog(options);
-                viewer.BGColor = d.Color;
-            };
-            colorlab.Text = "Model viewer bg color";
-            colorlab.Location = new System.Drawing.Point(16, 20);
-            colorlab.Width = 200;
-            options.Size = new System.Drawing.Size(512, 256);
-            options.Controls.Add(picker);
-            options.Controls.Add(colorlab);
-            options.Controls.Add(more);
-            options.ShowDialog(this);
+            new OptionsForm(this).ShowDialog(this);
+        }
+
+        private void aDXToolStripMenuItem_Click_1(object sender, EventArgs e)
+        {
+            //ADXFile adx = new ADXFile(File.OpenRead(@"BOKO.ADX"));
+        }
+
+        private void audioViewerToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            new AudioViewer.AudioPlayer(new System.Media.SoundPlayer()).Show();
         }
     }
 }
